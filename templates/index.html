@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compression</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #333;
+        }
+
+        .upload-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+
+        .radio-group {
+            margin: 1rem 0;
+            text-align: left;
+        }
+
+        .radio-label {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        #download-btn {
+            margin-top: 20px;
+            display: none;
+            padding: 10px 20px;
+            background-color: #008CBA;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        #download-btn:hover {
+            background-color: #007bb5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload & Compress Image</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="image" name="image" required>
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="accuracy" value="0.8" required> 80%
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="accuracy" value="0.9"> 90%
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="accuracy" value="0.95"> 95%
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="accuracy" value="0.99"> 99%
+                </label>
+            </div>
+            <button type="submit" class="upload-btn">Upload & Compress</button>
+        </form>
+
+        <!-- Hidden Download Button -->
+        <a id="download-btn" href="#" download>Download Compressed Image</a>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').onsubmit = async function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(document.getElementById('upload-form'));
+            const downloadButton = document.getElementById('download-btn');
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    alert(result.error);
+                    return;
+                }
+                
+                const compressedImagePath = result.compressedImagePath;
+                downloadButton.href = compressedImagePath;
+                downloadButton.style.display = 'inline-block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while processing the image.');
+            }
+        };
+    </script>
+</body>
+</html>
